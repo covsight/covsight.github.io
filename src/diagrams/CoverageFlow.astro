@@ -1,0 +1,175 @@
+---
+/**
+ * CoverageFlow diagram
+ * Three-column SVG: simulator inputs → CovSight core → consumer outputs
+ * All colors use CSS custom properties for automatic dark/light theming.
+ */
+
+const inputs = [
+  { label: 'Open-source simulators',   sub: 'Verilator'              },
+  { label: 'Closed-source simulators', sub: 'Questa / VCS / Xcelium' },
+  { label: 'cocotb',                   sub: ''                       },
+  { label: '+ more…',                  sub: ''                       },
+];
+
+const consumers = [
+  { label: 'Terminal / TUI',    icon: '>_'   },
+  { label: 'VS Code Extension', icon: '{ }'  },
+  { label: 'CI Pipeline',       icon: '▶▶'  },
+  { label: 'AI Agents (MCP)',   icon: '✦'    },
+  { label: 'Python API',        icon: 'Py'   },
+];
+
+// Layout constants
+const W = 520, H = 300;
+const leftX = 20, centerX = 210, rightX = 375;
+const nodeW = 155, nodeH = 44;
+const coreW = 130, coreH = 110;
+const rowH = H / (inputs.length + 1);
+const coreY = H / 2 - coreH / 2;
+---
+
+<svg
+  viewBox={`0 0 ${W} ${H}`}
+  class="diagram-svg w-full max-w-lg"
+  role="img"
+  aria-label="Data flow: closed-source and open-source simulators flow into CovSight core, which feeds terminal, VS Code, CI, AI agents, and Python API"
+  style="overflow: visible;"
+>
+  <defs>
+    <!-- Arrow markers -->
+    <marker id="arrow-in" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="var(--diag-core)" />
+    </marker>
+    <marker id="arrow-out" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="var(--diag-consumer)" />
+    </marker>
+
+    <!-- Dashed animated path style for inputs -->
+    <style>
+      @keyframes dash {
+        to { stroke-dashoffset: -24; }
+      }
+      .flow-in {
+        stroke: var(--diag-core);
+        stroke-width: 1.5;
+        stroke-dasharray: 6 4;
+        fill: none;
+        animation: dash 1.4s linear infinite;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .flow-in { animation: none; stroke-dasharray: none; }
+      }
+      .flow-out {
+        stroke: var(--diag-consumer);
+        stroke-width: 1.5;
+        fill: none;
+      }
+    </style>
+  </defs>
+
+  <!-- ── Input nodes ─────────────────────────────────────────── -->
+  {inputs.map((node, i) => {
+    const y = rowH * (i + 0.8) - nodeH / 2;
+    const midX = centerX + 5;
+    const midY = coreY + coreH / 2;
+    const nodeRight = leftX + nodeW;
+    const nodeMidY = y + nodeH / 2;
+    return (
+      <>
+        {/* Node box */}
+        <rect
+          x={leftX} y={y} width={nodeW} height={nodeH} rx="6"
+          fill="var(--diag-bg)"
+          stroke="var(--diag-source)"
+          stroke-width="1.5"
+        />
+        <text x={leftX + nodeW / 2} y={y + (node.sub ? 15 : 22)} text-anchor="middle"
+          font-size="10" font-weight="600" fill="var(--diag-text)">{node.label}</text>
+        {node.sub && (
+          <text x={leftX + nodeW / 2} y={y + 30} text-anchor="middle"
+            font-size="9" fill="var(--diag-source)">{node.sub}</text>
+        )}
+
+        {/* Animated arrow to core */}
+        <path
+          class="flow-in"
+          d={`M${nodeRight},${nodeMidY} C${nodeRight + 30},${nodeMidY} ${midX - 30},${midY} ${midX},${midY}`}
+          marker-end="url(#arrow-in)"
+        />
+      </>
+    );
+  })}
+
+  <!-- ── CovSight Core node ──────────────────────────────────── -->
+  <rect
+    x={centerX} y={coreY} width={coreW} height={coreH} rx="10"
+    fill="var(--diag-core)"
+    opacity="0.15"
+    stroke="var(--diag-core)"
+    stroke-width="2"
+  />
+  <!-- Small icon representation (chip die grid) -->
+  {[0,1,2].map(row => [0,1,2].map(col => {
+    const covered = !(row === 2 && col >= 1);
+    return (
+      <rect
+        x={centerX + 14 + col * 12} y={coreY + 10 + row * 12}
+        width="9" height="9" rx="1.5"
+        fill={covered ? 'var(--diag-core)' : 'var(--diag-source)'}
+        opacity="0.8"
+      />
+    );
+  }))}
+  <text x={centerX + coreW / 2} y={coreY + 60} text-anchor="middle"
+    font-size="12" font-weight="700" fill="var(--diag-core)">covsight-core</text>
+  <text x={centerX + coreW / 2} y={coreY + 75} text-anchor="middle"
+    font-size="8.5" fill="var(--diag-text)" opacity="0.7">NCDB Storage</text>
+  <text x={centerX + coreW / 2} y={coreY + 87} text-anchor="middle"
+    font-size="8.5" fill="var(--diag-text)" opacity="0.7">Merge · Analyze</text>
+
+  <!-- ── Consumer nodes ─────────────────────────────────────── -->
+  {consumers.map((node, i) => {
+    const y = rowH * (i + 0.8) - nodeH / 2;
+    const coreRight = centerX + coreW;
+    const coreMiddleY = coreY + coreH / 2;
+    const nodeMidY = y + nodeH / 2;
+    return (
+      <>
+        {/* Arrow from core */}
+        <path
+          class="flow-out"
+          d={`M${coreRight},${coreMiddleY} C${coreRight + 30},${coreMiddleY} ${rightX - 30},${nodeMidY} ${rightX},${nodeMidY}`}
+          marker-end="url(#arrow-out)"
+        />
+
+        {/* Node box */}
+        <rect
+          x={rightX} y={y} width={nodeW} height={nodeH} rx="6"
+          fill="var(--diag-bg)"
+          stroke="var(--diag-consumer)"
+          stroke-width="1.5"
+        />
+        <text x={rightX + 26} y={y + 16} text-anchor="start"
+          font-size="10" font-weight="600" fill="var(--diag-text)">{node.label}</text>
+        <text x={rightX + 10} y={y + 26} text-anchor="middle"
+          font-size="11" font-weight="700" fill="var(--diag-consumer)"
+          font-family="monospace">{node.icon}</text>
+      </>
+    );
+  })}
+
+  <!-- ── Column labels ──────────────────────────────────────── -->
+  <text x={leftX + nodeW / 2}  y={H - 4} text-anchor="middle"
+    font-size="9" fill="var(--diag-source)" font-weight="500" letter-spacing="0.04em">
+    COVERAGE SOURCES
+  </text>
+  <text x={centerX + coreW / 2} y={H - 4} text-anchor="middle"
+    font-size="9" fill="var(--diag-core)" font-weight="500" letter-spacing="0.04em">
+    COVSIGHT
+  </text>
+  <text x={rightX + nodeW / 2}  y={H - 4} text-anchor="middle"
+    font-size="9" fill="var(--diag-consumer)" font-weight="500" letter-spacing="0.04em">
+    YOUR WORKFLOW
+  </text>
+</svg>

@@ -1,0 +1,48 @@
+section_heading: "Four Pillars"
+pillars:
+  - id: universal-interchange
+    title: "One tool, every simulator."
+    body: "CovSight reads coverage from VCS, Questa, Xcelium, Verilator, cocotb, and
+      any UCIS-compliant source. It writes to LCOV, Cobertura, JaCoCo, and Clover for
+      software CI integration. Conversion is lossless where formats allow, with explicit
+      warnings when fidelity is reduced."
+    diagram: FormatMatrix
+
+  - id: efficient-storage
+    title: "60× smaller. Version-control friendly."
+    body: "NCDB — CovSight's open binary format — achieves 60–73× size reduction over
+      SQLite through LEB128 variable-length integers, toggle-pair compression, and
+      schema-aware encoding. A 150 MB UCIS XML database becomes under 2 MB. NCDB files
+      are plain ZIP archives: portable, diffable, and safe to commit to version control
+      or store as CI artifacts."
+    diagram: StorageSize
+    callout: "Test history · Flake scoring · Change detection · ZIP-portable"
+
+  - id: testplan-as-code
+    title: "Your testplan belongs in your repository."
+    body: "CovSight defines a YAML-based superset testplan format that imports from OpenTitan
+      Hjson, Cadence VPF XML, Synopsys VC Planner, and Siemens Questa Visualizer formats.
+      Testplans live in the repo, are version-controlled, support wildcard expansion,
+      composable imports, and direct bindings to coverage database paths for automated
+      closure computation."
+    diagram: TestplanFunnel
+    snippet: |
+      $schema: "https://schema.covsight.io/testplan/v1"
+      name: uart
+      imports:
+        - path: common/csr_testplan.yaml
+          substitutions: {name: uart}
+      testpoints:
+        - name: uart_tx_basic
+          desc: Verify basic UART transmit at all baud rates
+          tests: [uart_tx_{baud}]
+          coverage: uart_cg.tx_baud_cp
+
+  - id: coverage-driven
+    title: "Coverage tells you what to build next."
+    body: "CovSight's analysis engine tracks per-test coverage contributions over time,
+      identifies flaky tests using statistical scoring, and detects regressions with CUSUM
+      change detection. The MCP server surfaces this data to AI agents, enabling
+      natural-language queries about coverage gaps, test contributions, and what to
+      verify next."
+    diagram: IntelligenceLoop

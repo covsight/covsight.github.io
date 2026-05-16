@@ -1,0 +1,13 @@
+# Trademark notices shown in site footer
+notices:
+  - "VCS and Verdi are registered trademarks of Synopsys, Inc."
+  - "Questa and Questa Visualizer are trademarks of Siemens Industry Software Inc."
+  - "Xcelium and vManager are trademarks of Cadence Design Systems, Inc."
+  - "VC Planner is a trademark of Synopsys, Inc."
+  - "OpenTitan is a trademark of lowRISC CIC."
+  - "Visual Studio Code is a trademark of Microsoft Corporation."
+  - "GitHub is a trademark of GitHub, Inc."
+  - "Python is a trademark of the Python Software Foundation."
+  - "JaCoCo is a trademark of Mountainminds GmbH & Co. KG."
+  - "Clover is a trademark of Atlassian Pty Ltd."
+  - "All other trademarks are the property of their respective owners."

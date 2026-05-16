@@ -1,0 +1,36 @@
+- id: cli
+  name: "CLI"
+  icon: terminal
+  description: "covsight convert, merge, report, testplan — scriptable, composable, CI-ready."
+  href: "https://github.com/covsight/covsight#readme"
+
+- id: tui
+  name: "TUI"
+  icon: dashboard
+  description: "Interactive terminal UI with dashboard, hierarchy tree, coverage gaps, hotspots, and metrics views."
+  href: "https://github.com/covsight/covsight#readme"
+
+- id: github-actions
+  name: "CI Pipelines"
+  icon: actions
+  description: "Use the CLI in any CI environment — GitHub Actions, GitLab CI, Jenkins. Scriptable and exit-code driven."
+  href: "https://github.com/covsight/covsight#readme"
+
+- id: ai-agents
+  name: "AI Agents (MCP)"
+  icon: ai
+  description: "MCP tools expose coverage databases to LLM agents for natural-language analysis and next-step recommendations."
+  href: "https://github.com/covsight/covsight#readme"
+
+- id: python-api
+  name: "Python API"
+  icon: python
+  description: "Full programmatic access to all coverage data, analysis, and format conversion via the covsight package."
+  href: "https://github.com/covsight/covsight-core#readme"
+
+- id: vscode
+  name: "VS Code Extension"
+  icon: vscode
+  description: "Hierarchy tree, source gutter decorations, and a dashboard webview — coming soon."
+  href: "https://github.com/covsight"
+  roadmap: true

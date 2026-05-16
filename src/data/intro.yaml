@@ -1,0 +1,18 @@
+---
+tagline: "Open coverage intelligence for every simulator, every workflow, every team."
+mission: "CovSight is an open-source coverage intelligence platform built on open data
+  formats. It ingests coverage from any simulator — VCS, Questa, Xcelium, Verilator,
+  cocotb, and more — stores it in an open, portable format, links it to a structured
+  testplan, and delivers actionable insights through the terminal, VS Code, CI pipelines,
+  and AI agents. Your coverage data is yours: open formats, open APIs, no walled gardens."
+cta_primary:
+  label: "Get Started"
+  href: "https://github.com/covsight/covsight#readme"
+cta_secondary:
+  label: "Browse on GitHub"
+  href: "https://github.com/covsight"
+badges:
+  - "Apache-2.0"
+  - "Python"
+  - "TypeScript"
+  - "C/C++"

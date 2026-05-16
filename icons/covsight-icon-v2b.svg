@@ -1,0 +1,107 @@
+<!--
+  covsight icon v2b: "Coverage Chip"
+  Concept: the IC chip outline from v2, but the interior replaces the eye
+  with 4 stacked progress bars — the exact format engineers read every day
+  in coverage reports.  Traffic-light colouring (red/amber/green) gives an
+  immediate at-a-glance health signal.
+
+  Chip body:   160 × 120 px, centred at (128, 95)  →  x:48–208  y:35–155
+  3 pins/side (12 total), 15 px stubs.
+  Bars:        4 bars, track w=128 (x 64–192), h=12 rx=6, pitch=22
+               centred at cy=95 → y: 56, 78, 100, 122
+  Bar fills / colours (traffic-light scale):
+    bar 1  90%  115 px  green  #22c55e
+    bar 2  72%   92 px  amber  #f59e0b
+    bar 3  85%  109 px  green  #22c55e
+    bar 4  42%   54 px  red    #ef4444
+  100%-reference line at x=192 ties bars to full scale visually.
+
+  256×256 px  |  dark navy background
+-->
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <!-- Clip bar content to chip interior (1 px inside the stroke) -->
+    <clipPath id="chipClip">
+      <rect x="50" y="37" width="156" height="116" rx="9"/>
+    </clipPath>
+  </defs>
+
+  <!-- ── Background ── -->
+  <rect width="256" height="256" rx="36" fill="#0a192f"/>
+
+  <!-- ── Chip body ── -->
+  <rect x="48" y="35" width="160" height="120" rx="10"
+        fill="#0d2240" stroke="#4a8aaa" stroke-width="2"/>
+
+  <!-- Pin-1 indicator dot (top-left corner, inside chip) -->
+  <circle cx="60" cy="47" r="3.5" fill="#4a8aaa" opacity="0.7"/>
+
+  <!--
+    ── Pins (3 per side, 15 px stubs) ──
+    Spaced so they align visually with the bar boundaries.
+    Top/bottom: x = 85, 128, 171
+    Left/right:  y = 55, 95, 135
+  -->
+  <!-- Top -->
+  <line x1="85"  y1="35" x2="85"  y2="20" stroke="#4a8aaa" stroke-width="6" stroke-linecap="round"/>
+  <line x1="128" y1="35" x2="128" y2="20" stroke="#4a8aaa" stroke-width="6" stroke-linecap="round"/>
+  <line x1="171" y1="35" x2="171" y2="20" stroke="#4a8aaa" stroke-width="6" stroke-linecap="round"/>
+  <!-- Bottom -->
+  <line x1="85"  y1="155" x2="85"  y2="170" stroke="#4a8aaa" stroke-width="6" stroke-linecap="round"/>
+  <line x1="128" y1="155" x2="128" y2="170" stroke="#4a8aaa" stroke-width="6" stroke-linecap="round"/>
+  <line x1="171" y1="155" x2="171" y2="170" stroke="#4a8aaa" stroke-width="6" stroke-linecap="round"/>
+  <!-- Left -->
+  <line x1="48" y1="55"  x2="33" y2="55"  stroke="#4a8aaa" stroke-width="6" stroke-linecap="round"/>
+  <line x1="48" y1="95"  x2="33" y2="95"  stroke="#4a8aaa" stroke-width="6" stroke-linecap="round"/>
+  <line x1="48" y1="135" x2="33" y2="135" stroke="#4a8aaa" stroke-width="6" stroke-linecap="round"/>
+  <!-- Right -->
+  <line x1="208" y1="55"  x2="223" y2="55"  stroke="#4a8aaa" stroke-width="6" stroke-linecap="round"/>
+  <line x1="208" y1="95"  x2="223" y2="95"  stroke="#4a8aaa" stroke-width="6" stroke-linecap="round"/>
+  <line x1="208" y1="135" x2="223" y2="135" stroke="#4a8aaa" stroke-width="6" stroke-linecap="round"/>
+
+  <!--
+    ── Progress bars (clipped to chip interior) ──
+    Track (dark background) drawn first, then fill on top.
+    100%-reference line at x=192: thin white vertical, very subtle.
+  -->
+
+  <!-- 100% reference line -->
+  <line x1="192" y1="50" x2="192" y2="140"
+        stroke="#d8ecf6" stroke-width="1" opacity="0.18"
+        clip-path="url(#chipClip)"/>
+
+  <!-- Bar 1 — 90% — green -->
+  <rect x="64"  y="56" width="128" height="12" rx="6"
+        fill="#0a2a40" clip-path="url(#chipClip)"/>
+  <rect x="64"  y="56" width="115" height="12" rx="6"
+        fill="#22c55e" clip-path="url(#chipClip)"/>
+
+  <!-- Bar 2 — 72% — amber -->
+  <rect x="64"  y="78" width="128" height="12" rx="6"
+        fill="#0a2a40" clip-path="url(#chipClip)"/>
+  <rect x="64"  y="78" width="92"  height="12" rx="6"
+        fill="#f59e0b" clip-path="url(#chipClip)"/>
+
+  <!-- Bar 3 — 85% — green -->
+  <rect x="64"  y="100" width="128" height="12" rx="6"
+        fill="#0a2a40" clip-path="url(#chipClip)"/>
+  <rect x="64"  y="100" width="109" height="12" rx="6"
+        fill="#22c55e" clip-path="url(#chipClip)"/>
+
+  <!-- Bar 4 — 42% — red -->
+  <rect x="64"  y="122" width="128" height="12" rx="6"
+        fill="#0a2a40" clip-path="url(#chipClip)"/>
+  <rect x="64"  y="122" width="54"  height="12" rx="6"
+        fill="#ef4444" clip-path="url(#chipClip)"/>
+
+  <!-- ── Wordmark ── -->
+  <text x="128" y="208"
+        text-anchor="middle"
+        font-family="'Helvetica Neue', 'Inter', Arial, sans-serif"
+        font-weight="600"
+        font-size="30"
+        letter-spacing="1.5">
+    <tspan fill="#00c8a8">cov</tspan><tspan fill="#d8ecf6">sight</tspan>
+  </text>
+</svg>

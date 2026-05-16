@@ -1,0 +1,17 @@
+heading: "Coverage analysis shouldn't be locked in a proprietary data silo."
+intro: "Commercial EDA tools provide powerful coverage analytics — but the data stays
+  trapped in closed formats and vendor-specific APIs. Open-source EDA has no equivalent
+  at all. Teams mixing Verilator for CI with a commercial simulator for signoff have
+  no way to unify their data. CovSight breaks down those walls with open formats,
+  open APIs, and a unified data model built on the Accellera UCIS standard."
+comparison:
+  - without: "Coverage locked in closed, simulator-specific formats"
+    with:    "Open formats — read and write from any tool"
+  - without: "Analysis requires a proprietary vendor GUI"
+    with:    "Terminal, IDE, or CI — your choice"
+  - without: "Testplans live in spreadsheets or vendor GUIs"
+    with:    "Version-controlled YAML in your repo"
+  - without: "Regressions produce GBs of raw vendor data"
+    with:    "Compact, portable NCDB artifacts — KBs not GBs"
+  - without: "Coverage history locked in vendor tools; trends lost"
+    with:    "Persistent open test history with trend analysis"

@@ -1,0 +1,137 @@
+---
+/**
+ * FormatMatrix — hub-and-spoke showing all supported input/output formats
+ * Input formats arc left, output formats arc right, NCDB hub at center.
+ */
+
+const inputs = [
+  { label: 'UCIS XML',       cat: 'eda'  },
+  { label: 'UCDB',           cat: 'eda'  },
+  { label: 'Verilator .dat', cat: 'eda'  },
+  { label: 'cocotb XML',     cat: 'eda'  },
+  { label: 'cocotb YAML',    cat: 'eda'  },
+  { label: 'AVL JSON',       cat: 'eda'  },
+];
+
+const outputs = [
+  { label: 'NCDB',           cat: 'native' },
+  { label: 'LCOV',           cat: 'sw'    },
+  { label: 'Cobertura',      cat: 'sw'    },
+  { label: 'JaCoCo',         cat: 'sw'    },
+  { label: 'Clover',         cat: 'sw'    },
+  { label: 'UCIS XML',       cat: 'eda'  },
+];
+
+const catColor: Record<string, string> = {
+  eda:    'var(--diag-source)',
+  sw:     '#8b5cf6',
+  native: 'var(--diag-core)',
+};
+
+const W = 460, H = 280;
+const hubX = W / 2, hubY = H / 2;
+const hubR = 38;
+const nodeW = 96, nodeH = 26;
+
+function arcPositions(count: number, side: 'left' | 'right') {
+  const xCenter = side === 'left' ? 60 : W - 60;
+  const step = H / (count + 1);
+  return Array.from({ length: count }, (_, i) => ({
+    x: xCenter,
+    y: step * (i + 1),
+  }));
+}
+
+const leftPos  = arcPositions(inputs.length, 'left');
+const rightPos = arcPositions(outputs.length, 'right');
+---
+
+<svg
+  viewBox={`0 0 ${W} ${H}`}
+  class="diagram-svg w-full max-w-lg"
+  role="img"
+  aria-label="CovSight format compatibility: reads UCIS XML, UCDB, Verilator, cocotb, AVL and writes to NCDB, LCOV, Cobertura, JaCoCo, Clover, UCIS XML"
+>
+  <!-- Bezier spokes from inputs to hub -->
+  {inputs.map((node, i) => {
+    const p = leftPos[i];
+    const color = catColor[node.cat];
+    return (
+      <path
+        d={`M${p.x + nodeW / 2},${p.y} C${hubX - 60},${p.y} ${hubX - 60},${hubY} ${hubX - hubR},${hubY}`}
+        stroke={color} stroke-width="1.5" fill="none" opacity="0.7"
+      />
+    );
+  })}
+
+  <!-- Bezier spokes from hub to outputs -->
+  {outputs.map((node, i) => {
+    const p = rightPos[i];
+    const color = catColor[node.cat];
+    return (
+      <path
+        d={`M${hubX + hubR},${hubY} C${hubX + 60},${hubY} ${hubX + 60},${p.y} ${p.x - nodeW / 2},${p.y}`}
+        stroke={color} stroke-width="1.5" fill="none" opacity="0.7"
+      />
+    );
+  })}
+
+  <!-- Hub: NCDB node -->
+  <circle cx={hubX} cy={hubY} r={hubR}
+    fill="var(--diag-core)" opacity="0.15"
+    stroke="var(--diag-core)" stroke-width="2" />
+  <text x={hubX} y={hubY - 6} text-anchor="middle"
+    font-size="10" font-weight="700" fill="var(--diag-core)">covsight</text>
+  <text x={hubX} y={hubY + 8} text-anchor="middle"
+    font-size="9" fill="var(--diag-core)">core</text>
+  <text x={hubX} y={hubY + 20} text-anchor="middle"
+    font-size="7.5" fill="var(--diag-text)" opacity="0.6">NCDB</text>
+
+  <!-- Input nodes -->
+  {inputs.map((node, i) => {
+    const p = leftPos[i];
+    const color = catColor[node.cat];
+    return (
+      <>
+        <rect x={p.x - nodeW / 2} y={p.y - nodeH / 2} width={nodeW} height={nodeH} rx="5"
+          fill="var(--diag-bg)" stroke={color} stroke-width="1.5" />
+        <rect x={p.x - nodeW / 2} y={p.y - nodeH / 2} width="4" height={nodeH} rx="2"
+          fill={color} />
+        <text x={p.x + 4} y={p.y + 4} text-anchor="middle"
+          font-size="9.5" font-weight="500" fill="var(--diag-text)">{node.label}</text>
+      </>
+    );
+  })}
+
+  <!-- Output nodes -->
+  {outputs.map((node, i) => {
+    const p = rightPos[i];
+    const color = catColor[node.cat];
+    return (
+      <>
+        <rect x={p.x - nodeW / 2} y={p.y - nodeH / 2} width={nodeW} height={nodeH} rx="5"
+          fill="var(--diag-bg)" stroke={color} stroke-width="1.5" />
+        <rect x={p.x + nodeW / 2 - 4} y={p.y - nodeH / 2} width="4" height={nodeH} rx="2"
+          fill={color} />
+        <text x={p.x - 4} y={p.y + 4} text-anchor="middle"
+          font-size="9.5" font-weight="500" fill="var(--diag-text)">{node.label}</text>
+      </>
+    );
+  })}
+
+  <!-- Column labels -->
+  <text x={60}     y={H - 6} text-anchor="middle" font-size="8" fill="var(--diag-source)" font-weight="600" letter-spacing="0.05em">INPUTS</text>
+  <text x={W - 60} y={H - 6} text-anchor="middle" font-size="8" fill="var(--diag-source)" font-weight="600" letter-spacing="0.05em">OUTPUTS</text>
+
+  <!-- Legend -->
+  {[
+    { color: catColor.eda,    label: 'EDA / UCIS' },
+    { color: catColor.sw,     label: 'SW coverage' },
+    { color: catColor.native, label: 'Native NCDB' },
+  ].map((item, i) => (
+    <>
+      <rect x={hubX - 52 + i * 56} y={H - 18} width="8" height="8" rx="2" fill={item.color} />
+      <text x={hubX - 42 + i * 56} y={H - 11} font-size="7.5" fill="var(--diag-text)" opacity="0.7">{item.label}</text>
+    </>
+  ))}
+</svg>

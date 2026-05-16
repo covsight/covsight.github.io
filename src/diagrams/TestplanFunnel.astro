@@ -1,0 +1,100 @@
+---
+/**
+ * TestplanFunnel — four industry formats converging into the CovSight superset
+ */
+
+const sources = [
+  'OpenTitan Hjson',
+  'Cadence VPF XML',
+  'Synopsys CSV/XML',
+  'Questa XML',
+];
+
+const capabilities = [
+  'Version-controlled in repo',
+  'Coverage DB path binding',
+  'Wildcard test expansion',
+  'Composable imports',
+  'CI closure gate',
+];
+
+const W = 460, H = 260;
+const nodeW = 96, nodeH = 28;
+const hubX = W / 2, hubY = 120;
+const hubW = 140, hubH = 36;
+const srcY = 24;
+const capY = 188;
+const capSpacing = W / (capabilities.length + 1);
+---
+
+<svg
+  viewBox={`0 0 ${W} ${H}`}
+  class="diagram-svg w-full max-w-lg"
+  role="img"
+  aria-label="CovSight testplan superset format imports from OpenTitan Hjson, Cadence VPF XML, Synopsys CSV/XML, and Questa XML, and provides version control, coverage binding, wildcard expansion, composable imports, and CI closure gating"
+>
+  <!-- Source nodes (top row) -->
+  {sources.map((src, i) => {
+    const x = (W / (sources.length + 1)) * (i + 1);
+    const nodeX = x - nodeW / 2;
+    const nodeY = srcY;
+    return (
+      <>
+        <rect x={nodeX} y={nodeY} width={nodeW} height={nodeH} rx="5"
+          fill="var(--diag-bg)" stroke="var(--diag-source)" stroke-width="1.5" />
+        <text x={x} y={nodeY + 18} text-anchor="middle"
+          font-size="9" font-weight="500" fill="var(--diag-text)">{src}</text>
+
+        {/* Arrow to hub */}
+        <path
+          d={`M${x},${nodeY + nodeH} L${hubX},${hubY}`}
+          stroke="var(--diag-source)" stroke-width="1.5" fill="none" opacity="0.5"
+          marker-end="url(#funnel-arrow-in)"
+        />
+      </>
+    );
+  })}
+
+  <defs>
+    <marker id="funnel-arrow-in"  markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L7,3 z" fill="var(--diag-core)" />
+    </marker>
+    <marker id="funnel-arrow-out" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L7,3 z" fill="var(--diag-core)" opacity="0.6" />
+    </marker>
+  </defs>
+
+  <!-- Hub: CovSight Testplan YAML -->
+  <rect x={hubX - hubW / 2} y={hubY - hubH / 2} width={hubW} height={hubH} rx="8"
+    fill="var(--diag-core)" opacity="0.15"
+    stroke="var(--diag-core)" stroke-width="2" />
+  <text x={hubX} y={hubY - 5} text-anchor="middle"
+    font-size="10" font-weight="700" fill="var(--diag-core)">CovSight Testplan</text>
+  <text x={hubX} y={hubY + 9} text-anchor="middle"
+    font-size="9" fill="var(--diag-core)" opacity="0.8">YAML / JSON</text>
+
+  <!-- Arrows from hub to capabilities -->
+  {capabilities.map((_, i) => {
+    const x = capSpacing * (i + 1);
+    return (
+      <path
+        d={`M${hubX},${hubY + hubH / 2} L${x},${capY}`}
+        stroke="var(--diag-core)" stroke-width="1" fill="none" opacity="0.4"
+        marker-end="url(#funnel-arrow-out)"
+      />
+    );
+  })}
+
+  <!-- Capability labels (bottom row) -->
+  {capabilities.map((cap, i) => {
+    const x = capSpacing * (i + 1);
+    return (
+      <>
+        <circle cx={x} cy={capY + 10} r="4"
+          fill="var(--diag-core)" opacity="0.6" />
+        <text x={x} y={capY + 28} text-anchor="middle"
+          font-size="8.5" fill="var(--diag-text)" opacity="0.85">{cap}</text>
+      </>
+    );
+  })}
+</svg>

@@ -1,0 +1,65 @@
+---
+import pillarsData from '../data/pillars.yaml';
+import PillarBand from './PillarBand.astro';
+import FormatMatrix     from '../diagrams/FormatMatrix.astro';
+import StorageSize      from '../diagrams/StorageSize.astro';
+import TestplanFunnel   from '../diagrams/TestplanFunnel.astro';
+import IntelligenceLoop from '../diagrams/IntelligenceLoop.astro';
+
+const data = pillarsData as {
+  section_heading: string;
+  pillars: {
+    id: string;
+    title: string;
+    body: string;
+    diagram: string;
+    callout?: string;
+    snippet?: string;
+  }[];
+};
+
+const diagrams: Record<string, any> = {
+  FormatMatrix,
+  StorageSize,
+  TestplanFunnel,
+  IntelligenceLoop,
+};
+---
+
+<section
+  id="pillars"
+  class="py-8 bg-white dark:bg-navy-900"
+  aria-labelledby="pillars-heading"
+>
+  <div class="max-w-5xl mx-auto px-4 sm:px-6">
+
+    <h2
+      id="pillars-heading"
+      class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white"
+    >
+      {data.section_heading}
+    </h2>
+
+    <div class="divide-y divide-slate-100 dark:divide-navy-800">
+      {
+        data.pillars.map((pillar, i) => {
+          const DiagramComponent = diagrams[pillar.diagram];
+          return (
+            <PillarBand
+              number={i + 1}
+              id={pillar.id}
+              title={pillar.title}
+              body={pillar.body}
+              callout={pillar.callout}
+              snippet={pillar.snippet}
+              flip={i % 2 === 1}
+            >
+              {DiagramComponent && <DiagramComponent />}
+            </PillarBand>
+          );
+        })
+      }
+    </div>
+
+  </div>
+</section>

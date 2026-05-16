@@ -1,0 +1,58 @@
+---
+export interface Props {
+  number: number;
+  id: string;
+  title: string;
+  body: string;
+  callout?: string;
+  snippet?: string;
+  flip?: boolean; // alternate diagram left/right on desktop
+}
+const { number, id, title, body, callout, snippet, flip = false } = Astro.props;
+---
+
+<div
+  id={id}
+  class:list={[
+    'grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center py-16 lg:py-20',
+    flip && 'lg:[direction:rtl]',
+  ]}
+>
+  <!-- Text column (always LTR content inside) -->
+  <div class:list={[flip && 'lg:[direction:ltr]']}>
+    <div class="flex items-baseline gap-3 mb-3">
+      <span class="text-5xl font-black text-brand-500/20 dark:text-brand-400/15 leading-none select-none"
+        aria-hidden="true"
+      >{String(number).padStart(2, '0')}</span>
+      <h3 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white leading-snug">
+        {title}
+      </h3>
+    </div>
+
+    <p class="text-base text-slate-600 dark:text-slate-300 leading-relaxed">{body}</p>
+
+    {callout && (
+      <div class="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-50 dark:bg-brand-900/20 border border-brand-200 dark:border-brand-800 text-sm font-medium text-brand-700 dark:text-brand-300">
+        <span class="text-brand-500" aria-hidden="true">✦</span>
+        {callout}
+      </div>
+    )}
+
+    {snippet && (
+      <div class="mt-5 rounded-lg overflow-hidden border border-slate-200 dark:border-navy-700 shadow-sm">
+        <div class="bg-slate-800 px-4 py-2 text-xs font-mono text-slate-400 flex items-center gap-2">
+          <span class="text-brand-400">●</span> testplan.yaml
+        </div>
+        <pre
+          class="bg-slate-900 text-slate-300 text-xs font-mono p-4 overflow-x-auto leading-relaxed"
+          aria-label="Example testplan YAML"
+        ><code>{snippet}</code></pre>
+      </div>
+    )}
+  </div>
+
+  <!-- Diagram slot -->
+  <div class:list={['flex justify-center', flip && 'lg:[direction:ltr]']}>
+    <slot />
+  </div>
+</div>

@@ -1,0 +1,75 @@
+/* ── CovSight global CSS ─────────────────────────────────────────────────── */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Color tokens ────────────────────────────────────────────────────────── */
+
+:root {
+  --color-bg:         #ffffff;
+  --color-bg-subtle:  #f8fafc;
+  --color-text:       #0f172a;
+  --color-text-muted: #64748b;
+  --color-brand:      #0d9488;
+  --color-brand-dim:  #ccfbf1;
+  --color-border:     #e2e8f0;
+
+  /* Diagram palette */
+  --diag-source:   #94a3b8;  /* slate  — simulator inputs  */
+  --diag-core:     #0d9488;  /* teal   — CovSight core     */
+  --diag-consumer: #f59e0b;  /* amber  — consumer outputs  */
+  --diag-bg:       #f8fafc;
+  --diag-text:     #0f172a;
+}
+
+.dark {
+  --color-bg:         #0a1628;
+  --color-bg-subtle:  #0f1f3a;
+  --color-text:       #f1f5f9;
+  --color-text-muted: #94a3b8;
+  --color-brand:      #14b8a6;
+  --color-brand-dim:  #134e4a;
+  --color-border:     #1e3a5f;
+
+  --diag-source:   #475569;
+  --diag-core:     #14b8a6;
+  --diag-consumer: #d97706;
+  --diag-bg:       #0f1f3a;
+  --diag-text:     #f1f5f9;
+}
+
+/* ── Base ────────────────────────────────────────────────────────────────── */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: Inter, system-ui, sans-serif;
+}
+
+/* ── Focus visible ───────────────────────────────────────────────────────── */
+
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+/* ── Diagram SVG theming ─────────────────────────────────────────────────── */
+
+.diagram-svg text {
+  fill: var(--diag-text);
+  font-family: Inter, system-ui, sans-serif;
+}
+
+/* ── Reduced motion ──────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

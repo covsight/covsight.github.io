@@ -1,0 +1,16 @@
+heading: "Get started"
+subheading: "Install from PyPI. Open formats, open APIs — your coverage data is never locked in."
+
+steps:
+  - label: "Install the covsight package"
+    code: "pip install covsight"
+
+ctas:
+  - label: "Read the docs"
+    href: "https://github.com/covsight/covsight#readme"
+    primary: true
+  - label: "Browse on GitHub"
+    href: "https://github.com/covsight"
+    primary: false
+
+note: "covsight includes the CLI, TUI, MCP server, and all format adapters. covsight-core is the underlying library for programmatic use."

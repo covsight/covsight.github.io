@@ -11,6 +11,8 @@ __pycache__/
 build/
 develop-eggs/
 dist/
+node_modules/
+.astro/
 downloads/
 eggs/
 .eggs/
@@ -149,7 +151,6 @@ activemq-data/
 
 # Environments
 .env
-.envrc
 .venv
 env/
 venv/
@@ -216,3 +217,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+packages/
+

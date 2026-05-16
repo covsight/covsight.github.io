@@ -1,0 +1,17 @@
+section_heading: "A modular ecosystem"
+intro: "CovSight is two focused, independently installable packages.
+  covsight-core provides the foundation; covsight adds the full analysis
+  toolchain on top."
+
+layers:
+  - name: "Analysis Toolchain"
+    projects:
+      - id: covsight
+        label: "covsight"
+        sublabel: "CLI · TUI · MCP · format adapters"
+        repo: "https://github.com/covsight/covsight"
+
+core:
+  label: "covsight-core"
+  description: "UCIS data model · NCDB format · merge engine · testplan · Python · TypeScript · C/C++"
+  repo: "https://github.com/covsight/covsight-core"

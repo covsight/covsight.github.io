@@ -1,0 +1,29 @@
+links:
+  - label: "Why CovSight"
+    href: "#problem"
+  - label: "Features"
+    href: "#pillars"
+  - label: "Ecosystem"
+    href: "#ecosystem"
+  - label: "Get Started"
+    href: "#get-started"
+  - label: "GitHub"
+    href: "https://github.com/covsight"
+    external: true
+
+footer_links:
+  - label: "covsight"
+    href: "https://github.com/covsight/covsight"
+  - label: "covsight-core"
+    href: "https://github.com/covsight/covsight-core"
+  - label: "GitHub Organization"
+    href: "https://github.com/covsight"
+    external: true
+
+badges:
+  pypi:
+    package: "covsight"
+    href: "https://pypi.org/project/covsight/"
+  npm:
+    package: "@covsight/core"
+    href: "https://www.npmjs.com/package/@covsight/core"

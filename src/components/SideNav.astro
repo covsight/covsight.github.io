@@ -1,0 +1,131 @@
+---
+// SideNav renders on the client; no server data needed
+---
+
+<!-- Only visible on large screens -->
+<nav
+  id="side-nav"
+  aria-label="Page sections"
+  class="hidden xl:flex fixed right-6 top-1/2 -translate-y-1/2 z-40 flex-col gap-1"
+>
+  <!-- Items injected by JS -->
+</nav>
+
+<script>
+  interface NavItem {
+    id: string;
+    label: string;
+    depth: number; // 0 = top-level, 1 = nested
+  }
+
+  const items: NavItem[] = [
+    { id: 'top',                   label: 'Overview',              depth: 0 },
+    { id: 'problem',               label: 'The Problem',           depth: 0 },
+    { id: 'pillars',               label: 'Four Pillars',          depth: 0 },
+    { id: 'universal-interchange', label: 'Universal Interchange', depth: 1 },
+    { id: 'efficient-storage',     label: 'Efficient Storage',     depth: 1 },
+    { id: 'testplan-as-code',      label: 'Testplan as Code',      depth: 1 },
+    { id: 'coverage-driven',       label: 'Coverage-Driven',       depth: 1 },
+    { id: 'interfaces',            label: 'Interfaces',            depth: 0 },
+    { id: 'ecosystem',             label: 'Ecosystem',             depth: 0 },
+    { id: 'get-started',           label: 'Get Started',           depth: 0 },
+  ];
+
+  const nav = document.getElementById('side-nav');
+  if (!nav) throw new Error('side-nav not found');
+
+  // Build nav items
+  items.forEach(({ id, label, depth }) => {
+    const a = document.createElement('a');
+    a.href = id === 'top' ? '#' : `#${id}`;
+    a.dataset.target = id;
+    a.className = [
+      'group flex items-center gap-2 py-0.5 transition-all duration-200',
+      depth === 1 ? 'pl-3' : '',
+    ].join(' ');
+
+    // Dot
+    const dot = document.createElement('span');
+    dot.className = [
+      'shrink-0 rounded-full transition-all duration-200',
+      'bg-slate-300 dark:bg-slate-600',
+      depth === 0 ? 'w-2 h-2' : 'w-1.5 h-1.5',
+    ].join(' ');
+    dot.dataset.dot = '';
+
+    // Label (hidden, revealed on hover or active)
+    const txt = document.createElement('span');
+    txt.textContent = label;
+    txt.className = [
+      'text-xs font-medium whitespace-nowrap transition-all duration-200',
+      'text-slate-400 dark:text-slate-500',
+      'opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0',
+      // active class added by JS: 'side-nav-label-active'
+    ].join(' ');
+    txt.dataset.label = '';
+
+    a.appendChild(dot);
+    a.appendChild(txt);
+    nav.appendChild(a);
+  });
+
+  // Rearrange so label appears to the left of the dot (RTL inside the flex item)
+  nav.querySelectorAll('a').forEach((a) => {
+    a.style.flexDirection = 'row-reverse';
+  });
+
+  // Track active section with IntersectionObserver
+  const anchors = items.map(({ id }) =>
+    id === 'top' ? document.body : document.getElementById(id)
+  );
+
+  // Map from section id → nav anchor element
+  const navLinks = new Map<string, HTMLAnchorElement>();
+  nav.querySelectorAll<HTMLAnchorElement>('a').forEach((a) => {
+    navLinks.set(a.dataset.target ?? '', a);
+  });
+
+  function setActive(id: string) {
+    navLinks.forEach((a, key) => {
+      const isActive = key === id;
+      const dot = a.querySelector<HTMLSpanElement>('[data-dot]');
+      const label = a.querySelector<HTMLSpanElement>('[data-label]');
+      if (dot) {
+        dot.classList.toggle('bg-brand-500', isActive);
+        dot.classList.toggle('dark:bg-brand-400', isActive);
+        dot.classList.toggle('scale-125', isActive);
+        dot.classList.toggle('bg-slate-300', !isActive);
+        dot.classList.toggle('dark:bg-slate-600', !isActive);
+      }
+      if (label) {
+        label.classList.toggle('opacity-100', isActive);
+        label.classList.toggle('translate-x-0', isActive);
+        label.classList.toggle('text-slate-800', isActive);
+        label.classList.toggle('dark:text-white', isActive);
+        label.classList.toggle('font-semibold', isActive);
+        label.classList.toggle('text-slate-400', !isActive);
+        label.classList.toggle('dark:text-slate-500', !isActive);
+      }
+    });
+  }
+
+  // Use scroll position to find the current section
+  const sectionEls = items
+    .map(({ id }) => ({ id, el: id === 'top' ? null : document.getElementById(id) }))
+    .filter(({ el }) => el !== null) as { id: string; el: HTMLElement }[];
+
+  // Add a virtual "top" entry
+  function getActiveId(): string {
+    const scrollY = window.scrollY + 120; // offset for fixed nav
+    let active = 'top';
+    for (const { id, el } of sectionEls) {
+      if (el.offsetTop <= scrollY) {
+        active = id;
+      }
+    }
+    return active;
+  }
+
+  setActive(getActiveId());
+  window.addEventListener('scroll', () => setActive(getActiveId()), { passive: true });
+</script>
