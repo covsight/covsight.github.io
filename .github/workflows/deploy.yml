@@ -2,8 +2,9 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main]
-  workflow_dispatch:
+    branches: [main]      # build only -- the deploy job is gated below
+    tags: ['v*']          # build + deploy
+  workflow_dispatch:      # build + deploy, on demand
 
 permissions:
   contents: read
@@ -36,6 +37,18 @@ jobs:
           path: dist/
 
   deploy:
+    # Publication is TAG-DRIVEN, not branch-driven.
+    #
+    # Forgejo is the origin of truth and mirrors main to GitHub automatically
+    # (sync-policy.toml [org.covsight]). If this job fired on a branch push,
+    # every mirrored commit would republish the live site as a side effect of a
+    # sync enabled for unrelated reasons. A `v*` tag is the deliberate act.
+    #
+    # The build job above still runs on every push, so a broken site build is
+    # caught immediately rather than at release time. Only the publish is gated.
+    #
+    # workflow_dispatch stays available for an out-of-band republish.
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
     needs: build
     runs-on: ubuntu-latest
     environment:
