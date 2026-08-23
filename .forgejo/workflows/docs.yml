@@ -1,0 +1,97 @@
+# Org landing page build for covsight/covsight.github.io on Forgejo Actions.
+#
+# THIS IS THE ONLY THING THAT PUBLISHES THIS SITE. .github/workflows/deploy.yml
+# builds it too, as a CI check, but its Pages deploy was deleted -- see
+# ~/Documents/dvkit-docs-publishing-design.md 5.9. dvkit.org owns all
+# documentation, and an <org>.github.io repo is the ORG LANDING PAGE: it lands
+# at dvkit.org/<org>/, one level above the per-repo docs at
+# dvkit.org/<org>/<repo>/.
+#
+# That placement is not something this file arranges. docs-deploy special-cases
+# a repo named exactly `<org>.github.io` and lays it down at live/<org> rather
+# than live/<org>/<name>. So the artifact name below has to keep the `.github.io`
+# suffix -- rename it and the site silently publishes to
+# dvkit.org/covsight/covsight.github.io/ instead.
+#
+# The whole chain is automatic: a successful run fires a CI-success webhook, and
+# publish-trigger runs `docs-sync covsight/covsight.github.io main`, which
+# fetches, auto-promotes (default branch only) and redeploys the whole tree.
+# Nothing here deploys; the built site leaves as an ARTIFACT and the Cloudflare
+# token stays on the host.
+#
+# THE SUBPATH IS THE SHARP EDGE HERE. This site used to be served at the root of
+# covsight.github.io and is now served under /covsight, which is finding F8 in
+# the docs-publishing design: Sphinx output is subpath-portable, a site build is
+# not. astro.config.mjs sets `base: '/covsight'` to make Astro emit prefixed
+# URLs, but `base` does NOT rewrite hand-written href="/..." in .astro sources
+# -- those must use import.meta.env.BASE_URL. Two of them existed (the favicon
+# and the logo home link) and were converted. The check below fails the build if
+# a third ever appears, because the symptom otherwise is a link that works in
+# local preview and 404s in production.
+#
+# No third-party actions: a bare `uses:` resolves against code.forgejo.org, not
+# github.com. The runner's `ubuntu-latest` is catthehacker/ubuntu:act-22.04,
+# which carries Node 24 -- enough for Astro 4.
+
+name: Docs
+
+on:
+  - push
+  - pull_request
+  - workflow_dispatch
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for internal identifiers in tracked files
+        # This repo is published to git.dvkit.org and mirrored to GitHub, so
+        # anything committed here is public. Internal host names, tailnet
+        # addresses and CGNAT-range IPs must not appear in tracked files.
+        run: |
+          pattern='perch-char\.ts\.net|\.ts\.net|a9550|100\.(6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])\.[0-9]+\.[0-9]+'
+          if git grep -nIE "$pattern" -- . ':!.forgejo/workflows/docs.yml' ; then
+            echo "::error::internal identifier found in a tracked file (see matches above)"
+            exit 1
+          fi
+          echo "OK: no internal identifiers in tracked files"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build site
+        run: npm run build
+
+      - name: Sanity-check the build
+        # A static-site build can exit 0 having produced nothing, and an empty
+        # landing page is worse than a failed one because it deploys.
+        run: |
+          test -s dist/index.html \
+            || { echo "::error::no index.html in the build output"; exit 1; }
+          echo "built files: $(find dist -type f | wc -l)"
+
+      - name: Every internal URL carries the /covsight base path
+        # The check that makes F8 non-recurring. Any root-absolute internal URL
+        # in the output that is not under /covsight/ will 404 in production
+        # while working perfectly in `astro preview`.
+        run: |
+          if bad=$(grep -ohE '(href|src)="/[^"]*"' dist/*.html \
+                   | grep -vE '="/covsight/' || true); [ -n "$bad" ]; then
+            echo "::error::root-absolute URL(s) not under /covsight -- these will 404 in production:"
+            printf '%s\n' "$bad"
+            echo "Use import.meta.env.BASE_URL in the .astro source; astro's \`base\` does not rewrite hand-written hrefs."
+            exit 1
+          fi
+          echo "OK: all root-absolute URLs are under /covsight/"
+
+      - name: Upload site
+        # Consumed by the host-side poller: `docs-fetch covsight/covsight.github.io main`.
+        # The `.github.io` suffix is load-bearing -- see the header note.
+        uses: forgejo/upload-artifact@v4
+        with:
+          name: docs-covsight-covsight.github.io
+          path: dist/**
+          if-no-files-found: error
