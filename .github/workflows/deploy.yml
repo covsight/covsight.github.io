@@ -1,19 +1,42 @@
-name: Deploy to GitHub Pages
+name: Build site
+
+# BUILD ONLY. This workflow does not publish anything, by design.
+#
+# This repo is the source of the covsight ORG LANDING PAGE, which is published
+# by FORGEJO to dvkit.org/covsight/ -- not by GitHub Pages to
+# covsight.github.io. See ~/Documents/dvkit-docs-publishing-design.md 5.9:
+# dvkit.org owns all documentation, and both kinds of Pages content live there.
+# An <org>.github.io repo lands at dvkit.org/<org>/; an ordinary repo's docs
+# land at dvkit.org/<org>/<repo>/.
+#
+# dvkit.org is a single Cloudflare Pages project and a deploy replaces the
+# WHOLE site, so there is exactly one publisher for it: the host-side poller,
+# which reads build artifacts from the Forgejo API with a Cloudflare token that
+# never enters a job container. A GitHub Pages site here would be a second
+# publisher of the same content on a different schedule, which is what drifts.
+#
+# This job stays because a site build that breaks should still fail a push.
+#
+# History, because the intermediate state looks like a finished one: the deploy
+# job was first converted from branch-driven to tag-driven, so that the first
+# mirrored push could not republish the site as a side effect of a sync
+# (sync-policy.toml, [release] trigger = "tag"). That was a migration step, not
+# the destination -- a tag-gated deploy is still a second publisher. Both steps
+# were required, in that order.
+#
+# The repo itself stays as the SOURCE of the landing page; Forgejo remains its
+# origin of truth. What it stops doing is serving. Once dvkit.org/covsight/
+# verifies, covsight.github.io becomes a redirect stub pointing at it (5.8).
 
 on:
   push:
-    branches: [main]      # build only -- the deploy job is gated below
-    tags: ['v*']          # build + deploy
-  workflow_dispatch:      # build + deploy, on demand
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
 
 jobs:
   build:
@@ -31,29 +54,3 @@ jobs:
 
       - name: Build site
         run: npm run build
-
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist/
-
-  deploy:
-    # Publication is TAG-DRIVEN, not branch-driven.
-    #
-    # Forgejo is the origin of truth and mirrors main to GitHub automatically
-    # (sync-policy.toml [org.covsight]). If this job fired on a branch push,
-    # every mirrored commit would republish the live site as a side effect of a
-    # sync enabled for unrelated reasons. A `v*` tag is the deliberate act.
-    #
-    # The build job above still runs on every push, so a broken site build is
-    # caught immediately rather than at release time. Only the publish is gated.
-    #
-    # workflow_dispatch stays available for an out-of-band republish.
-    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
-    steps:
-      - id: deploy
-        uses: actions/deploy-pages@v4
